@@ -43,6 +43,16 @@ class Alert(BaseModel):
     clearAfter: int
     
     
+def verify_alert(alert: Alert):
+    crits = [0,1,2]
+    if alert.criticality not in crits:
+        return False
+    
+    if alert.clearAfter < 0:
+        return False
+    
+    return True
+    
 @app.get("/")
 def get_alerts():
     alerts = AlertModel.select().order_by(AlertModel.criticality.asc(), AlertModel.timestamp.desc())
@@ -72,6 +82,10 @@ def run_clean():
     
 @app.post("/create")
 def create_alert(alert: Alert):
+    if not verify_alert(alert):
+        return {
+            "error": "Invalid alert"
+        }
     try:        
         alert = AlertModel.create(
             message=alert.message,
