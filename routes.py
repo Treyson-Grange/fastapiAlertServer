@@ -4,6 +4,7 @@ from models import AlertModel, ManualAlertModel
 from schemas import Alert, ManualAlert, ApiAlerts
 from utils import verify_alert, calc_criticality
 import logging
+import os
 
 logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.DEBUG)
@@ -14,7 +15,7 @@ alert_router = APIRouter()
 @alert_router.get("/alerts")
 def get_all_alerts(group: str = None):
     if group is None:
-        return []
+        group = os.getenv("DEFAULT_GROUP")
 
     today = datetime.now(timezone.utc)
     all_alerts = []

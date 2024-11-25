@@ -3,9 +3,10 @@
 from peewee import (
     SqliteDatabase,
 )
+import os
 from main import AlertModel, ManualAlertModel
 
-db = SqliteDatabase("alerts.db")
+db = SqliteDatabase(os.getenv('DB_PATH'))
 
 db.connect()
 

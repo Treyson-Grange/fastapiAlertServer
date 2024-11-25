@@ -1,4 +1,9 @@
 from peewee import SqliteDatabase
+from dotenv import load_dotenv
 
-db = SqliteDatabase("alerts.db")
+import os
+
+load_dotenv()
+
+db = SqliteDatabase(os.getenv("DB_PATH"))
 db.connect()
