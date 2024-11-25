@@ -22,13 +22,23 @@ The general idea of this is to run it on a box. It more or less acts as a catch 
 
 ## Alert Structure
 
-The alert structure is still up for solidification. As it stands, an alert stores:
+There are two types of alerts: Alerts that will be triggered, added, and displayed till cleared:
 
--   Message: Alert description, purely for display.
--   Criticality: There are 3 levels. 0: Critical | 1: Warning | 2: Info.
--   AutoClear: Bool to determine whether alert will need manual clear.
--   Timestamp: datetime of when the alert was set.
--   ClearAfter: Minutes the alert should last.
+-   **Message**: Alert description, purely for display.
+-   **Criticality**: There are 3 levels. 0: Critical | 1: Warning | 2: Info.
+-   **AutoClear**: Bool to determine whether alert will need manual clear.
+-   **Timestamp**: datetime of when the alert was set.
+-   **ClearAfter**: Minutes the alert should last.
+
+Additionally, there are manual alerts that will start to appear a specified number of days before their due date. These alerts will increase in criticality as the due date approaches and will automatically clear on the due date.
+
+These alerts can be manually cleared if the event is addressed early.
+
+-   **Expiration Day**: The date when the event occurs.
+-   **Days Before**: The number of days before the event when the alert should start appearing.
+-   **Message**: The message to display for the event.
+
+Criticality levels will decrease (0 is critical, 2 is informational) as the due date approaches.
 
 ## Stack
 
