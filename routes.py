@@ -10,6 +10,7 @@ logger.setLevel(logging.DEBUG)
 
 alert_router = APIRouter()
 
+
 @alert_router.get("/alerts")
 def get_all_alerts(group: str = None):
     all_alerts = []
@@ -50,7 +51,6 @@ def get_all_alerts(group: str = None):
 
         if due_date - timedelta(days=manual_alert.daysNotice) < today:
             total_days_diff = (due_date - today).days
-            logger.debug(f"Total days diff: {total_days_diff}")
             if due_date > today:
                 to_add = ApiAlerts(
                     id=manual_alert.id,
@@ -81,7 +81,6 @@ def run_clean():
             alert.delete_instance()
 
 
-
 @alert_router.post("/create")
 def create_alert(alert: Alert):
     if not verify_alert(alert):
@@ -108,7 +107,6 @@ def create_alert(alert: Alert):
         return {"error": str(e)}
 
 
-
 @alert_router.post("/create-manual")
 def create_manual_alert(manual_alert: ManualAlert):
     try:
@@ -127,8 +125,6 @@ def create_manual_alert(manual_alert: ManualAlert):
         }
     except Exception as e:
         return {"error": str(e)}
-
-
 
 
 @alert_router.post("/delete/{alert_id}")

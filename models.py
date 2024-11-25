@@ -1,6 +1,7 @@
 from peewee import Model, CharField, IntegerField, BooleanField, DateTimeField
 from database import db
 
+
 class AlertModel(Model):
     message = CharField()
     criticality = IntegerField()

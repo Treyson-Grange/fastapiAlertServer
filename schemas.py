@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+
 class Alert(BaseModel):
     message: str
     criticality: int
