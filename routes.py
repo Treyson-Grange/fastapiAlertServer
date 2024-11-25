@@ -13,27 +13,29 @@ alert_router = APIRouter()
 
 @alert_router.get("/alerts")
 def get_all_alerts(group: str = None):
-    all_alerts = []
-    # Auto alerts
-    if group:
-        alerts = (
-            AlertModel.select()
-            .where(AlertModel.group == group)
-            .order_by(AlertModel.criticality.asc(), AlertModel.timestamp.desc())
-        )
-        for alert in alerts:
-            a = ApiAlerts(
-                id=alert.id,
-                message=alert.message,
-                criticality=alert.criticality,
-                timestamp=alert.timestamp,
-            )
-            all_alerts.append(a)
-    else:
+    if group is None:
         return []
 
-    # Manual alerts
-    today = datetime.now()
+    today = datetime.now(timezone.utc)
+    all_alerts = []
+    alerts = (
+        AlertModel.select()
+        .where(AlertModel.group == group)
+        .order_by(AlertModel.criticality.asc(), AlertModel.timestamp.desc())
+    )
+    for alert in alerts:
+        if alert.autoClear:
+            timestamp = datetime.strptime(alert.timestamp, "%Y-%m-%d %H:%M:%S.%f%z")
+            if timestamp + timedelta(minutes=alert.clearAfter) < today:
+                alert.delete_instance()
+                continue
+        a = ApiAlerts(
+            id=alert.id,
+            message=alert.message,
+            criticality=alert.criticality,
+            timestamp=alert.timestamp,
+        )
+        all_alerts.append(a)
 
     manual_alerts = (
         ManualAlertModel.select()
@@ -46,8 +48,6 @@ def get_all_alerts(group: str = None):
 
         if due_date.tzinfo is None:
             due_date = due_date.replace(tzinfo=timezone.utc)
-
-        today = datetime.now(timezone.utc)
 
         if due_date - timedelta(days=manual_alert.daysNotice) < today:
             total_days_diff = (due_date - today).days
@@ -66,19 +66,9 @@ def get_all_alerts(group: str = None):
             else:
                 manual_alert.delete_instance()
 
-    # Then sort all alerts by timestamp
-    all_alerts.sort(key=lambda x: x.timestamp, reverse=True)
+    all_alerts.sort(key=lambda x: (x.criticality, x.timestamp))
 
     return all_alerts
-
-
-@alert_router.get("/run-clean")
-def run_clean():
-    alerts = AlertModel.select().where(AlertModel.autoClear == True)
-    for alert in alerts:
-        timestamp = datetime.strptime(alert.timestamp, "%Y-%m-%d %H:%M:%S%z")
-        if timestamp + timedelta(minutes=alert.clearAfter) < datetime.now(timezone.utc):
-            alert.delete_instance()
 
 
 @alert_router.post("/create")

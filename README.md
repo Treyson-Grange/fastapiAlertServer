@@ -13,35 +13,55 @@ The general idea of this is to run it on a box. It more or less acts as a catch 
 -   No expiring cert.
 -   Scalable, well kept, etc.
 
+## Structure
+
+The main functionality of the project has been split into several files.
+
+-   `main.py`: Entry point for the `FastAPI` server. Sets up middleware to allow for CORS.
+-   `routes.py`: Set up and expose all API requests. Allows for the retrieval of all alerts, the creation of alerts, and the deletion of alerts.
+-   `schemas.py`: Defines `pydantic` models for use within `FastAPI`. Defines our two alerts, (manual and auto) and defines which attribute
+    s are sent via API.
+-   `models.py`: Defines `peewee` database models. Defines our two stored alerts (manual and auto).
+-   `utils.py`: Contains all miscellaneous functions for use within our app. (Verification, calculations, etc)
+-   `database.py`: Simply connect to our `peewee` database
+-   `createdb.py`: Standalone script to create a database file in your directory.
+-   `backup_script.py`: Script designed to be run as a CRON job to create and store backups of the database.
+
 ## Endpoints
 
--   `/`: Get a JSON list of all alerts, ordered by criticality then time.
--   `/run-clean`: This will be scheduled, not an endpoint, but it goes through checks timestamp against clearAfter, and removes it if necessary.
--   `/create`: Create an alert.
--   `/delete/{id}`: Delete an alert based on id. (manual acknowledgement)
+-   `/alerts`: GET a JSON list of all alerts, both manual and auto, sort them by criticality and timestamp
+-   `/run-clean`: GET request to run a job that will be cronified later
+-   `/create`: POST request to create an auto alert.
+-   `/create-manual`: POST request to create a manual alert.
+-   `/delete/{id}`: POST request to delete an alert based on id. (acknowledgement)
+-   `/delete-manual/{id}`: POST request to Delete a manual alert based on id. (acknowledgement)
 
 ## Alert Structure
 
-There are two types of alerts: Alerts that will be triggered, added, and displayed till cleared:
+There are two types of alerts:
 
--   **Message**: Alert description, purely for display.
--   **Criticality**: There are 3 levels. 0: Critical | 1: Warning | 2: Info.
--   **AutoClear**: Bool to determine whether alert will need manual clear.
--   **Timestamp**: datetime of when the alert was set.
--   **ClearAfter**: Minutes the alert should last.
+Auto Alerts: Will be triggered, added, and displayed till cleared:
 
-Additionally, there are manual alerts that will start to appear a specified number of days before their due date. These alerts will increase in criticality as the due date approaches and will automatically clear on the due date.
+-   `message`: Alert description, purely for display.
+-   `criticality`: There are 3 levels. 0: Critical | 1: Warning | 2: Info.
+-   `autoClear`: Bool to determine whether alert will need manual clear.
+-   `timestamp`: datetime of when the alert was set.
+-   `clearAfter`: Minutes the alert should last.
+-   `group`: Group that the alert belongs to/will be sent to.
+
+Manual Alerts: Start to appear a specified number of days before their due date. These alerts will increase in criticality as the due date approaches and will automatically clear on the due date.
 
 These alerts can be manually cleared if the event is addressed early.
 
--   **Expiration Day**: The date when the event occurs.
--   **Days Before**: The number of days before the event when the alert should start appearing.
--   **Message**: The message to display for the event.
+-   `dueDate`: The date when the event occurs.
+-   `daysNotice`: The number of days before the event when the alert should start appearing.
+-   `message`: The message to display for the event.
+-   `group`: Group that the alert belongs to/will be sent to.
 
-Criticality levels will decrease (0 is critical, 2 is informational) as the due date approaches.
+Criticality levels decrease (0 is critical, 2 is informational) as the due date approaches.
 
 ## Stack
 
--   FastAPI: API
--   PeeWee: DB
--   Scheduling: Up in the air
+-   `FastAPI`: API Web framework
+-   `PeeWee`: DataBase ORM
+-   `Scheduling`: Up in the air
