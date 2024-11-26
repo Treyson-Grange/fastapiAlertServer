@@ -1,8 +1,13 @@
 from fastapi import APIRouter
 from datetime import datetime, timedelta, timezone
-from models import AlertModel, ManualAlertModel
+from models import AlertModel, ManualAlertModel, GroupModel
 from schemas import Alert, ManualAlert, ApiAlerts
-from utils import verify_alert, calc_criticality
+from utils import (
+    verify_alert,
+    calc_criticality,
+    verify_manual_alert,
+    verify_group_exist,
+)
 import logging
 import os
 
@@ -14,8 +19,17 @@ alert_router = APIRouter()
 
 @alert_router.get("/alerts")
 def get_all_alerts(group: str = None):
+    """
+    Given a group, return all alerts for that group.
+
+    Returns:
+        List of auto and manual alerts for the group.
+    """
     if group is None:
         group = os.getenv("DEFAULT_GROUP")
+
+    if not verify_group_exist(group):
+        return {"error": "Group does not exist"}
 
     today = datetime.now(timezone.utc)
     all_alerts = []
@@ -74,6 +88,16 @@ def get_all_alerts(group: str = None):
 
 @alert_router.post("/create")
 def create_alert(alert: Alert):
+    """
+    Create an auto alert, given an alert object.
+
+    Parameters:
+        alert: Alert object.
+
+    Returns:
+        Alert object when successful, error message when not.
+
+    """
     if not verify_alert(alert):
         return {"error": "Invalid alert"}
     try:
@@ -100,6 +124,17 @@ def create_alert(alert: Alert):
 
 @alert_router.post("/create-manual")
 def create_manual_alert(manual_alert: ManualAlert):
+    """
+    Create a manual alert, given a manual alert object.
+
+    Parameters:
+        manual_alert: ManualAlert object.
+
+    Returns:
+        ManualAlert object when successful, error message when not.
+    """
+    if not verify_manual_alert(manual_alert):
+        return {"error": "Invalid manual alert"}
     try:
         manual_alert = ManualAlertModel.create(
             dueDate=manual_alert.dueDate,
@@ -120,6 +155,15 @@ def create_manual_alert(manual_alert: ManualAlert):
 
 @alert_router.post("/delete/{alert_id}")
 def delete_alert(alert_id: int):
+    """
+    Delete an auto alert, given an alert ID.
+
+    Parameters:
+        alert_id: int
+
+    Returns:
+        Message when successful, error message when not.
+    """
     try:
         alert = AlertModel.get(AlertModel.id == alert_id)
         alert.delete_instance()
@@ -132,6 +176,15 @@ def delete_alert(alert_id: int):
 
 @alert_router.post("/delete-manual/{alert_id}")
 def delete_manual_alert(alert_id: int):
+    """
+    Delete a manual alert, given a manual alert ID.
+
+    Parameters:
+        alert_id: int
+
+    Returns:
+        Message when successful, error message when not.
+    """
     try:
         alert = ManualAlertModel.get(ManualAlertModel.id == alert_id)
         alert.delete_instance()
@@ -140,3 +193,51 @@ def delete_manual_alert(alert_id: int):
         return {"error": "Alert not found"}
     except Exception as e:
         return {"error": str(e)}
+
+
+# Endpoints for testing purposes only
+
+
+@alert_router.get("/all")
+def get_all_alerts():
+    """
+    Get all alerts, regardless of group.
+    """
+    all_alerts = []
+    alerts = AlertModel.select()
+    for alert in alerts:
+        a = ApiAlerts(
+            id=alert.id,
+            message=alert.message,
+            criticality=alert.criticality,
+            timestamp=alert.timestamp,
+        )
+        all_alerts.append(a)
+
+    manual_alerts = ManualAlertModel.select()
+
+    for manual_alert in manual_alerts:
+        to_add = ApiAlerts(
+            id=manual_alert.id,
+            type="manual",
+            message=manual_alert.message,
+            criticality=0,
+            timestamp=manual_alert.dueDate,
+        )
+        all_alerts.append(to_add)
+
+    all_alerts.sort(key=lambda x: (x.criticality, x.timestamp))
+
+    return all_alerts
+
+
+@alert_router.get("/groups")
+def get_all_groups():
+    """
+    Get all groups.
+    """
+    groups = GroupModel.select()
+    all_groups = []
+    for group in groups:
+        all_groups.append({"name": group.name, "description": group.description})
+    return all_groups

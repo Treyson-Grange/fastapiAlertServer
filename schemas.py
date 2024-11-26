@@ -24,4 +24,9 @@ class ApiAlerts(BaseModel):
     message: str
     criticality: int
     timestamp: datetime
-    days: int = None
+
+
+# On creation, we will want to make sure that the group exists.
+class Group(BaseModel):
+    name: str
+    description: str

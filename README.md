@@ -65,3 +65,7 @@ Criticality levels decrease (0 is critical, 2 is informational) as the due date 
 -   `FastAPI`: API Web framework
 -   `PeeWee`: DataBase ORM
 -   `Scheduling`: Up in the air
+
+## Food for thought / Mind Dump
+
+-   For auto alerts, we should change it so on creation, we create the date object ourselves, so we know its in the correct format.

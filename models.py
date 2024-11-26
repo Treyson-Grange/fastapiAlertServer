@@ -22,3 +22,11 @@ class ManualAlertModel(Model):
 
     class Meta:
         database = db
+
+
+class GroupModel(Model):
+    name = CharField()
+    description = CharField()
+
+    class Meta:
+        database = db

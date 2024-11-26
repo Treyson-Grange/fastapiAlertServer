@@ -8,7 +8,7 @@ from routes import alert_router
 
 load_dotenv()
 
-allowed_origins = os.getenv('ALLOWED_ORIGINS').split(',')
+allowed_origins = os.getenv("ALLOWED_ORIGINS").split(",")
 
 app = FastAPI()
 
