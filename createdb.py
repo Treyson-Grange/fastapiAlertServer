@@ -6,15 +6,18 @@ from peewee import (
 import os
 from models import AlertModel, ManualAlertModel, GroupModel
 
-db = SqliteDatabase(os.getenv("DB_PATH"))
 
-db.connect()
+def create_db():
+    db = SqliteDatabase(os.getenv("DB_PATH"))
+    db.connect()
 
-db.create_tables([AlertModel, ManualAlertModel, GroupModel], safe=True)
+    db.create_tables([AlertModel, ManualAlertModel, GroupModel], safe=True)
+
+    GroupModel.create(name="usuNetworking", description="USU IT Networking Team")
+    GroupModel.create(name="usuIT", description="USU IT Department")
+
+    db.close()
 
 
-# Seed the database
-GroupModel.create(name="usuNetworking", description="USU IT Networking Team")
-GroupModel.create(name="usuIT", description="USU IT Department")
-
-db.close()
+if __name__ == "__main__":
+    create_db()

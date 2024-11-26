@@ -16,7 +16,6 @@ def verify_alert(alert):
     if alert.clearAfter < 0:
         return False
 
-    # TODO: Once `group` is added as a table, we check if the group exists here.
     if alert.group:
         verify_group_exist(alert.group)
 

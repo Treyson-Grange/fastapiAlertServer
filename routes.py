@@ -234,7 +234,7 @@ def get_all_alerts():
 @alert_router.get("/groups")
 def get_all_groups():
     """
-    Get all groups.
+    Retrieve a list of all groups.
     """
     groups = GroupModel.select()
     all_groups = []

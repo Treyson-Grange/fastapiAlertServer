@@ -26,7 +26,6 @@ class ApiAlerts(BaseModel):
     timestamp: datetime
 
 
-# On creation, we will want to make sure that the group exists.
 class Group(BaseModel):
     name: str
     description: str

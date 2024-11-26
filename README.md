@@ -36,6 +36,11 @@ The main functionality of the project has been split into several files.
 -   `/delete/{id}`: POST request to delete an alert based on id. (acknowledgement)
 -   `/delete-manual/{id}`: POST request to Delete a manual alert based on id. (acknowledgement)
 
+Testing only endpoints:
+
+-   `/all`: GET a JSON list of all alerts, no group required.
+-   `/groups`: GET a JSON list of all groups in our database. No group endpoints will be created, groups is a internal utility only.
+
 ## Alert Structure
 
 There are two types of alerts:
