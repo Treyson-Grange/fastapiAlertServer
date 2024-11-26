@@ -1,5 +1,5 @@
 from peewee import Model, CharField, IntegerField, BooleanField, DateTimeField
-from database import db
+from app.database import db
 
 
 class AlertModel(Model):

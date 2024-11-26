@@ -13,6 +13,17 @@ The general idea of this is to run it on a box. It more or less acts as a catch 
 -   No expiring cert.
 -   Scalable, well kept, etc.
 
+## Running and Testing
+
+-   Running (Development)
+
+    -   Install all required dependencies: `pip install -r requirements.txt`
+    -   Create your local database: `python3 -m scripts.createdb`
+    -   Start the server: `fastapi dev main.py`
+
+-   Testing
+    -   Run all test cases defined in `/tests/`: `pytest`
+
 ## Structure
 
 The main functionality of the project has been split into several files.
@@ -64,12 +75,6 @@ These alerts can be manually cleared if the event is addressed early.
 -   `group`: Group that the alert belongs to/will be sent to.
 
 Criticality levels decrease (0 is critical, 2 is informational) as the due date approaches.
-
-## Stack
-
--   `FastAPI`: API Web framework
--   `PeeWee`: DataBase ORM
--   `Scheduling`: Up in the air
 
 ## Food for thought / Mind Dump
 

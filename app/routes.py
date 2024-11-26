@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from datetime import datetime, timedelta, timezone
-from models import AlertModel, ManualAlertModel, GroupModel
-from schemas import Alert, ManualAlert, ApiAlerts
-from utils import (
+from app.models import AlertModel, ManualAlertModel, GroupModel
+from app.schemas import Alert, ManualAlert, ApiAlerts
+from app.utils import (
     verify_alert,
     calc_criticality,
     verify_manual_alert,

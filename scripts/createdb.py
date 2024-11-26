@@ -1,10 +1,6 @@
-# Just run this when you need to create the database.
-
-from peewee import (
-    SqliteDatabase,
-)
+from peewee import SqliteDatabase
 import os
-from models import AlertModel, ManualAlertModel, GroupModel
+from app.models import AlertModel, ManualAlertModel, GroupModel
 
 
 def create_db():

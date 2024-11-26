@@ -1,4 +1,4 @@
-from models import GroupModel
+from app.models import GroupModel
 
 
 def verify_alert(alert):
