@@ -29,19 +29,21 @@ The general idea of this is to run it on a box. It more or less acts as a catch 
 The main functionality of the project has been split into several files.
 
 -   `main.py`: Entry point for the `FastAPI` server. Sets up middleware to allow for CORS.
--   `routes.py`: Set up and expose all API requests. Allows for the retrieval of all alerts, the creation of alerts, and the deletion of alerts.
--   `schemas.py`: Defines `pydantic` models for use within `FastAPI`. Defines our two alerts, (manual and auto) and defines which attribute
+-   `app/routes.py`: Set up and expose all API requests. Allows for the retrieval of all alerts, the creation of alerts, and the deletion of alerts.
+-   `app/schemas.py`: Defines `pydantic` models for use within `FastAPI`. Defines our two alerts, (manual and auto) and defines which attribute
     s are sent via API.
--   `models.py`: Defines `peewee` database models. Defines our two stored alerts (manual and auto).
--   `utils.py`: Contains all miscellaneous functions for use within our app. (Verification, calculations, etc)
--   `database.py`: Simply connect to our `peewee` database
--   `createdb.py`: Standalone script to create a database file in your directory.
--   `backup_script.py`: Script designed to be run as a CRON job to create and store backups of the database.
+-   `app/models.py`: Defines `peewee` database models. Defines our two stored alerts (manual and auto).
+-   `app/utils.py`: Contains all miscellaneous functions for use within our app. (Verification, calculations, etc)
+-   `app/database.py`: Simply connect to our `peewee` database
+-   `scripts/createdb.py`: Standalone script to create a database file in your directory.
+-   `scripts/backup_script.py`: Script designed to be run as a CRON job to create and store backups of the database.
+-   `tests/test_routes.py`: Test functions to ensure endpoint functionality
 
 ## Endpoints
 
+Endpoints are defined in `app/routes.py`. All communication to the alert server will need to be protected. Specifics regarding this are not fleshed out, but are up for discussion.
+
 -   `/alerts`: GET a JSON list of all alerts, both manual and auto, sort them by criticality and timestamp
--   `/run-clean`: GET request to run a job that will be cronified later
 -   `/create`: POST request to create an auto alert.
 -   `/create-manual`: POST request to create a manual alert.
 -   `/delete/{id}`: POST request to delete an alert based on id. (acknowledgement)

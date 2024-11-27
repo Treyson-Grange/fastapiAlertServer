@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from datetime import datetime, timedelta, timezone
 from app.models import AlertModel, ManualAlertModel, GroupModel
 from app.schemas import Alert, ManualAlert, ApiAlerts
@@ -99,7 +99,7 @@ def create_alert(alert: Alert):
 
     """
     if not verify_alert(alert):
-        return {"error": "Invalid alert"}
+        raise HTTPException(status_code=400, detail="Invalid alert")
     try:
         alert = AlertModel.create(
             message=alert.message,
@@ -119,7 +119,7 @@ def create_alert(alert: Alert):
             "group": alert.group,
         }
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @alert_router.post("/create-manual")

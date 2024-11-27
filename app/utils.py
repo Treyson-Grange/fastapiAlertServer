@@ -17,7 +17,7 @@ def verify_alert(alert):
         return False
 
     if alert.group:
-        verify_group_exist(alert.group)
+        return verify_group_exist(alert.group)
 
     return True
 
@@ -36,7 +36,7 @@ def verify_manual_alert(alert):
         return False
 
     if alert.group:
-        verify_group_exist(alert.group)
+        return verify_group_exist(alert.group)
 
     return True
 
