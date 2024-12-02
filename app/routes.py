@@ -1,15 +1,15 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime, timedelta, timezone
 from app.models import AlertModel, ManualAlertModel, GroupModel
 from app.schemas import Alert, ManualAlert, ApiAlerts
 from app.utils import (
-    verify_alert,
+    verify_auto_alert,
     calc_criticality,
     verify_manual_alert,
     verify_group_exist,
+    verify_api_key,
 )
-import logging
-import os
+import logging, os
 
 logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.DEBUG)
@@ -17,7 +17,7 @@ logger.setLevel(logging.DEBUG)
 alert_router = APIRouter()
 
 
-@alert_router.get("/alerts")
+@alert_router.get("/alerts", dependencies=[Depends(verify_api_key)])
 def get_all_alerts(group: str = None):
     """
     Given a group, return all alerts for that group.
@@ -86,7 +86,7 @@ def get_all_alerts(group: str = None):
     return all_alerts
 
 
-@alert_router.post("/create")
+@alert_router.post("/create", dependencies=[Depends(verify_api_key)])
 def create_alert(alert: Alert):
     """
     Create an auto alert, given an alert object.
@@ -98,7 +98,7 @@ def create_alert(alert: Alert):
         Alert object when successful, error message when not.
 
     """
-    if not verify_alert(alert):
+    if not verify_auto_alert(alert):
         raise HTTPException(status_code=400, detail="Invalid alert")
     try:
         alert = AlertModel.create(
@@ -122,7 +122,7 @@ def create_alert(alert: Alert):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@alert_router.post("/create-manual")
+@alert_router.post("/create-manual", dependencies=[Depends(verify_api_key)])
 def create_manual_alert(manual_alert: ManualAlert):
     """
     Create a manual alert, given a manual alert object.
@@ -153,7 +153,7 @@ def create_manual_alert(manual_alert: ManualAlert):
         return {"error": str(e)}
 
 
-@alert_router.post("/delete/{alert_id}")
+@alert_router.post("/delete/{alert_id}", dependencies=[Depends(verify_api_key)])
 def delete_alert(alert_id: int):
     """
     Delete an auto alert, given an alert ID.
@@ -174,7 +174,7 @@ def delete_alert(alert_id: int):
         return {"error": str(e)}
 
 
-@alert_router.post("/delete-manual/{alert_id}")
+@alert_router.post("/delete-manual/{alert_id}", dependencies=[Depends(verify_api_key)])
 def delete_manual_alert(alert_id: int):
     """
     Delete a manual alert, given a manual alert ID.

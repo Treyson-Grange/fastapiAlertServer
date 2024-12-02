@@ -1,7 +1,26 @@
 from app.models import GroupModel
+from fastapi import HTTPException, Header
+import os
+
+API_KEYS = os.getenv("ACCEPTED_KEYS").split(",")
 
 
-def verify_alert(alert):
+def verify_api_key(api_key: str = Header(...)):
+    """
+    Verify that the API key is valid.
+
+    Parameters:
+        api_key (str): The API key.
+
+    Returns:
+        bool: True if the API key is valid, Exception if it is not.
+    """
+    if api_key not in API_KEYS:
+        raise HTTPException(status_code=401, detail="Invalid API Key")
+    return True
+
+
+def verify_auto_alert(alert):
     """
     Verify before creation that an auto alert is valid.
 

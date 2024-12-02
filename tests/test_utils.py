@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from main import app
 from app.models import AlertModel
 from app.utils import (
-    verify_alert,
+    verify_auto_alert,
     verify_manual_alert,
     calc_criticality,
     verify_group_exist,
@@ -24,7 +24,7 @@ def test_verify_alert():
         group="usuIT",
     )
 
-    assert verify_alert(alert) == True
+    assert verify_auto_alert(alert) == True
 
     alert = AlertModel(
         message="test",
@@ -35,7 +35,7 @@ def test_verify_alert():
         group="usuIT",
     )
 
-    assert verify_alert(alert) == False
+    assert verify_auto_alert(alert) == False
 
     alert = AlertModel(
         message="test",
@@ -46,7 +46,7 @@ def test_verify_alert():
         group="usuIT",
     )
 
-    assert verify_alert(alert) == False
+    assert verify_auto_alert(alert) == False
 
     alert = AlertModel(
         message="test",
@@ -57,7 +57,7 @@ def test_verify_alert():
         group="usuITs",
     )
 
-    assert verify_alert(alert) == False
+    assert verify_auto_alert(alert) == False
 
 
 def test_verify_manual_alert():
