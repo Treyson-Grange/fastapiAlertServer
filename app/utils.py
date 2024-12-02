@@ -52,7 +52,7 @@ def calc_criticality(day_diff, days_notice):
     Returns:
         int: The criticality of the alert. (0: Critical, 1: Warning, or 2: Info)
     """
-    CRITICALITIES = {0: 0, 0.2: 1, 1: 2}
+    CRITICALITIES = {0.2: 0, 0.5: 1, 1: 2}
 
     percentage = day_diff / days_notice
 

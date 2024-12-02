@@ -103,4 +103,23 @@ def test_verify_group_exist():
     """
     assert verify_group_exist("usuIT") == True
     assert verify_group_exist("usuITs") == False
-    
+
+
+def test_calc_criticality():
+    """
+    Test suite for calc_criticality function.
+    """
+    test_cases = [
+        {"day_diff": 0, "days_notice": 10, "expected": 0},
+        {"day_diff": 2, "days_notice": 10, "expected": 0},
+        {"day_diff": 3, "days_notice": 10, "expected": 1},
+        {"day_diff": 5, "days_notice": 10, "expected": 1},
+        {"day_diff": 8, "days_notice": 10, "expected": 2},
+        {"day_diff": 10, "days_notice": 10, "expected": 2},
+    ]
+
+    for case in test_cases:
+        result = calc_criticality(case["day_diff"], case["days_notice"])
+        assert (
+            result == case["expected"]
+        ), f"Expected {case['expected']} but got {result}"
