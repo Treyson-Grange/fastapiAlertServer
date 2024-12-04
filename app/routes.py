@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Header
 from datetime import datetime, timedelta, timezone
 from app.models import AlertModel, ManualAlertModel, GroupModel, APIKeyModel
 from app.schemas import Alert, ManualAlert, ApiAlerts
@@ -8,7 +8,6 @@ from app.utils import (
     verify_manual_alert,
     verify_group_exist,
     verify_api_key,
-    
 )
 import logging, os
 
@@ -19,24 +18,24 @@ alert_router = APIRouter()
 
 
 @alert_router.get("/alerts", dependencies=[Depends(verify_api_key("read"))])
-def get_all_alerts(group: str = None):
+def get_all_alerts(USU_Group: str = Header(None)):
     """
     Given a group, return all alerts for that group.
 
     Returns:
         List of auto and manual alerts for the group.
     """
-    if group is None:
-        group = os.getenv("DEFAULT_GROUP")
+    if USU_Group is None:
+        USU_Group = os.getenv("DEFAULT_GROUP")
 
-    if not verify_group_exist(group):  # Check if group exists
+    if not verify_group_exist(USU_Group):
         raise HTTPException(status_code=400, detail="Group does not exist")
 
     today = datetime.now(timezone.utc)
     all_alerts = []
     alerts = (
         AlertModel.select()
-        .where(AlertModel.group == group)
+        .where(AlertModel.group == USU_Group)
         .order_by(AlertModel.criticality.asc(), AlertModel.timestamp.desc())
     )
     for alert in alerts:
@@ -55,7 +54,7 @@ def get_all_alerts(group: str = None):
 
     manual_alerts = (
         ManualAlertModel.select()
-        .where(ManualAlertModel.group == group if group else True)
+        .where(ManualAlertModel.group == USU_Group if USU_Group else True)
         .order_by(ManualAlertModel.dueDate.asc())
     )
 
