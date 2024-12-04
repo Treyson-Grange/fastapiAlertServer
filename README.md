@@ -22,7 +22,19 @@ The general idea of this is to run it on a box. It more or less acts as a catch 
     -   Start the server: `fastapi dev main.py`
 
 -   Testing
+
     -   Run all test cases defined in `/tests/`: `pytest`
+
+-   Running (Docker)
+
+I was having DNS issues when trying to compose build, but this worked for me.
+
+```
+docker build --network=host -t alert_box .
+docker run --name alertbox -d -p 9000:8000 alertbox
+```
+
+Head to [localhost:8000/all](localhost:8000/all) (a test endpoint that does not require a API key) to verify the functionality of the server.
 
 ## Structure
 
@@ -30,20 +42,21 @@ The main functionality of the project has been split into several files.
 
 -   `main.py`: Entry point for the `FastAPI` server. Sets up middleware to allow for CORS.
 -   `app/routes.py`: Set up and expose all API requests. Allows for the retrieval of all alerts, the creation of alerts, and the deletion of alerts.
--   `app/schemas.py`: Defines `pydantic` models for use within `FastAPI`. Defines our two alerts, (manual and auto) and defines which attribute
+-   `app/schemas.py`: Defines `pydantic` models for use within `FastAPI`. Defines our two alerts, (manual and auto) and defines which attribute.
     s are sent via API.
 -   `app/models.py`: Defines `peewee` database models. Defines our two stored alerts (manual and auto).
 -   `app/utils.py`: Contains all miscellaneous functions for use within our app. (Verification, calculations, etc)
--   `app/database.py`: Simply connect to our `peewee` database
+-   `app/database.py`: Simply connect to our `peewee` database.
 -   `scripts/createdb.py`: Standalone script to create a database file in your directory.
 -   `scripts/backup_script.py`: Script designed to be run as a CRON job to create and store backups of the database.
--   `tests/test_routes.py`: Test functions to ensure endpoint functionality
+-   `tests/test_routes.py`: Test functions to ensure endpoint functionality.
+-   `tests/test_utils.py`: Test functions to ensure utility functionality.
 
 ## Endpoints
 
 Endpoints are defined in `app/routes.py`. All communication to the alert server will need to be protected. Specifics regarding this are not fleshed out, but are up for discussion.
 
--   `/alerts`: GET a JSON list of all alerts, both manual and auto, sort them by criticality and timestamp
+-   `/alerts`: GET a JSON list of all alerts, both manual and auto, sort them by criticality and timestamp.
 -   `/create`: POST request to create an auto alert.
 -   `/create-manual`: POST request to create a manual alert.
 -   `/delete/{id}`: POST request to delete an alert based on id. (acknowledgement)

@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+    app:
+        build:
+            context: .
+        ports:
+            - "8000:8000"
+        env_file:
+            - .env
+        volumes:
+            - ./alerts.db:/alerts.db
+        dns:
+            - 8.8.8.8
+            - 8.8.4.4

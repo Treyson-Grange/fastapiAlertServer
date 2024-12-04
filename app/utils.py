@@ -1,24 +1,35 @@
 from app.models import GroupModel
 from fastapi import HTTPException, Header
+from app.models import APIKeyModel
 import os
 
 API_KEYS = os.getenv("ACCEPTED_KEYS").split(",")
 
-
-def verify_api_key(api_key: str = Header(...)):
+def verify_api_key(needed_perm: str):
     """
-    Verify that the API key is valid.
-
+    Verify that the API key is valid and has the needed permissions.
+    
     Parameters:
-        api_key (str): The API key.
-
+        needed_perm (str): The permission needed to access the API.
+    
     Returns:
-        bool: True if the API key is valid, Exception if it is not.
+        function: The dependency function.
+        
+    Raises:
+        HTTPException: If the API key is invalid or does not have the needed permissions.
     """
-    if api_key not in API_KEYS:
-        raise HTTPException(status_code=401, detail="Invalid API Key")
-    return True
-
+    def dependency(api_key: str = Header(...)):
+        key = APIKeyModel.get_or_none(APIKeyModel.key == api_key)
+        if not key:
+            raise HTTPException(status_code=403, detail="Invalid API key")
+        
+        perms = key.permissions.split(",")
+        for perm in perms:
+            if perm == needed_perm:
+                return True
+        
+        raise HTTPException(status_code=403, detail="Invalid permissions")
+    return dependency
 
 def verify_auto_alert(alert):
     """

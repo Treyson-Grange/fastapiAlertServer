@@ -30,3 +30,16 @@ class GroupModel(Model):
 
     class Meta:
         database = db
+
+
+class APIKeyModel(Model):
+    key = CharField(unique=True)
+    client_name = CharField()
+    is_active = BooleanField()
+    permissions = (
+        CharField()
+    )  # Comma separated list of permissions E.g. "read,write,delete"
+    # service to service api key, won't expire.
+
+    class Meta:
+        database = db

@@ -5,5 +5,5 @@ import os
 
 load_dotenv()
 
-db = SqliteDatabase(os.getenv("DB_PATH"))
+db = SqliteDatabase(os.getenv("DB_PATH", "alerts.db"))
 db.connect()

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime, timedelta, timezone
-from app.models import AlertModel, ManualAlertModel, GroupModel
+from app.models import AlertModel, ManualAlertModel, GroupModel, APIKeyModel
 from app.schemas import Alert, ManualAlert, ApiAlerts
 from app.utils import (
     verify_auto_alert,
@@ -8,6 +8,7 @@ from app.utils import (
     verify_manual_alert,
     verify_group_exist,
     verify_api_key,
+    
 )
 import logging, os
 
@@ -17,7 +18,7 @@ logger.setLevel(logging.DEBUG)
 alert_router = APIRouter()
 
 
-@alert_router.get("/alerts", dependencies=[Depends(verify_api_key)])
+@alert_router.get("/alerts", dependencies=[Depends(verify_api_key("read"))])
 def get_all_alerts(group: str = None):
     """
     Given a group, return all alerts for that group.
@@ -28,8 +29,8 @@ def get_all_alerts(group: str = None):
     if group is None:
         group = os.getenv("DEFAULT_GROUP")
 
-    if not verify_group_exist(group):
-        return {"error": "Group does not exist"}
+    if not verify_group_exist(group):  # Check if group exists
+        raise HTTPException(status_code=400, detail="Group does not exist")
 
     today = datetime.now(timezone.utc)
     all_alerts = []
@@ -86,7 +87,7 @@ def get_all_alerts(group: str = None):
     return all_alerts
 
 
-@alert_router.post("/create", dependencies=[Depends(verify_api_key)])
+@alert_router.post("/create", dependencies=[Depends(verify_api_key("write"))])
 def create_alert(alert: Alert):
     """
     Create an auto alert, given an alert object.
@@ -100,6 +101,10 @@ def create_alert(alert: Alert):
     """
     if not verify_auto_alert(alert):
         raise HTTPException(status_code=400, detail="Invalid alert")
+
+    if not verify_group_exist(alert.group):
+        raise HTTPException(status_code=400, detail="Group does not exist")
+
     try:
         alert = AlertModel.create(
             message=alert.message,
@@ -122,7 +127,7 @@ def create_alert(alert: Alert):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@alert_router.post("/create-manual", dependencies=[Depends(verify_api_key)])
+@alert_router.post("/create-manual", dependencies=[Depends(verify_api_key("write"))])
 def create_manual_alert(manual_alert: ManualAlert):
     """
     Create a manual alert, given a manual alert object.
@@ -134,7 +139,11 @@ def create_manual_alert(manual_alert: ManualAlert):
         ManualAlert object when successful, error message when not.
     """
     if not verify_manual_alert(manual_alert):
-        return {"error": "Invalid manual alert"}
+        raise HTTPException(status_code=400, detail="Invalid alert")
+
+    if not verify_group_exist(manual_alert.group):
+        raise HTTPException(status_code=400, detail="Group does not exist")
+
     try:
         manual_alert = ManualAlertModel.create(
             dueDate=manual_alert.dueDate,
@@ -153,7 +162,7 @@ def create_manual_alert(manual_alert: ManualAlert):
         return {"error": str(e)}
 
 
-@alert_router.post("/delete/{alert_id}", dependencies=[Depends(verify_api_key)])
+@alert_router.post("/delete/{alert_id}", dependencies=[Depends(verify_api_key("delete"))])
 def delete_alert(alert_id: int):
     """
     Delete an auto alert, given an alert ID.
@@ -174,7 +183,7 @@ def delete_alert(alert_id: int):
         return {"error": str(e)}
 
 
-@alert_router.post("/delete-manual/{alert_id}", dependencies=[Depends(verify_api_key)])
+@alert_router.post("/delete-manual/{alert_id}", dependencies=[Depends(verify_api_key("delete"))])
 def delete_manual_alert(alert_id: int):
     """
     Delete a manual alert, given a manual alert ID.
@@ -241,3 +250,22 @@ def get_all_groups():
     for group in groups:
         all_groups.append({"name": group.name, "description": group.description})
     return all_groups
+
+
+@alert_router.get("/keys")
+def get_all_keys():
+    """
+    Retrieve a list of all API keys
+    """
+    keys = APIKeyModel.select()
+    all_keys = []
+    for key in keys:
+        all_keys.append(
+            {
+                "key": key.key,
+                "client_name": key.client_name,
+                "is_active": key.is_active,
+                "permissions": key.permissions,
+            }
+        )
+    return all_keys
