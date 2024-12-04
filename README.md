@@ -38,6 +38,8 @@ Head to [localhost:8000/all](localhost:8000/all) (a test endpoint that does not 
 
 ## Structure
 
+### App
+
 The main functionality of the project has been split into several files.
 
 -   `main.py`: Entry point for the `FastAPI` server. Sets up middleware to allow for CORS.
@@ -47,8 +49,15 @@ The main functionality of the project has been split into several files.
 -   `app/models.py`: Defines `peewee` database models. Defines our two stored alerts (manual and auto).
 -   `app/utils.py`: Contains all miscellaneous functions for use within our app. (Verification, calculations, etc)
 -   `app/database.py`: Simply connect to our `peewee` database.
+
+### Scripts
+
 -   `scripts/createdb.py`: Standalone script to create a database file in your directory.
 -   `scripts/backup_script.py`: Script designed to be run as a CRON job to create and store backups of the database.
+-   `scripts/rotate_keys.py`: Script that rotates keys, and updates the keys on bitwarden for each client when applicable. (WIP)
+
+### Testing Suite
+
 -   `tests/test_routes.py`: Test functions to ensure endpoint functionality.
 -   `tests/test_utils.py`: Test functions to ensure utility functionality.
 
@@ -65,13 +74,14 @@ Endpoints are defined in `app/routes.py`. All communication to the alert server 
 Testing only endpoints:
 
 -   `/all`: GET a JSON list of all alerts, no group required.
--   `/groups`: GET a JSON list of all groups in our database. No group endpoints will be created, groups is a internal utility only.
+-   `/groups`: GET a JSON list of all groups in our database.
+-   `/keys`: GET a JSON list of all API keys.
 
 ## Alert Structure
 
-There are two types of alerts:
+### Auto Alerts:
 
-Auto Alerts: Will be triggered, added, and displayed till cleared:
+Will be triggered, added, and displayed till cleared:
 
 -   `message`: Alert description, purely for display.
 -   `criticality`: There are 3 levels. 0: Critical | 1: Warning | 2: Info.
@@ -80,7 +90,9 @@ Auto Alerts: Will be triggered, added, and displayed till cleared:
 -   `clearAfter`: Minutes the alert should last.
 -   `group`: Group that the alert belongs to/will be sent to.
 
-Manual Alerts: Start to appear a specified number of days before their due date. These alerts will increase in criticality as the due date approaches and will automatically clear on the due date.
+### Manual Alerts:
+
+Start to appear a specified number of days before their due date. These alerts will increase in criticality as the due date approaches and will automatically clear on the due date.
 
 These alerts can be manually cleared if the event is addressed early.
 

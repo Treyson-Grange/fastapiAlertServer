@@ -1,6 +1,11 @@
 from fastapi.testclient import TestClient
 from main import app
 from app.models import AlertModel, ManualAlertModel, GroupModel
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 client = TestClient(app)
 
@@ -19,8 +24,11 @@ def test_create_auto_success():
         "clearAfter": "100",
         "group": "usuIT",
     }
-
-    response = client.post("/create", json=test_alert)
+    response = client.post(
+        "/create",
+        json=test_alert,
+        headers={"API-Key": os.getenv("ACCEPTED_KEYS").split(",")[0]},
+    )
 
     assert response.status_code == 200
 
@@ -40,7 +48,10 @@ def test_create_auto_fail():
         "clearAfter": "100",
         "group": "usuITs",
     }
-
-    response = client.post("/create", json=test_alert)
+    response = client.post(
+        "/create",
+        json=test_alert,
+        headers={"API-Key": os.getenv("ACCEPTED_KEYS").split(",")[0]},
+    )
 
     assert response.status_code == 400

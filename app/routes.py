@@ -161,7 +161,9 @@ def create_manual_alert(manual_alert: ManualAlert):
         return {"error": str(e)}
 
 
-@alert_router.post("/delete/{alert_id}", dependencies=[Depends(verify_api_key("delete"))])
+@alert_router.post(
+    "/delete/{alert_id}", dependencies=[Depends(verify_api_key("delete"))]
+)
 def delete_alert(alert_id: int):
     """
     Delete an auto alert, given an alert ID.
@@ -182,7 +184,9 @@ def delete_alert(alert_id: int):
         return {"error": str(e)}
 
 
-@alert_router.post("/delete-manual/{alert_id}", dependencies=[Depends(verify_api_key("delete"))])
+@alert_router.post(
+    "/delete-manual/{alert_id}", dependencies=[Depends(verify_api_key("delete"))]
+)
 def delete_manual_alert(alert_id: int):
     """
     Delete a manual alert, given a manual alert ID.
