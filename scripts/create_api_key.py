@@ -5,7 +5,10 @@ from app.models import APIKeyModel
 
 
 def create_api_key(client_name, permissions):
-    api_key = str(uuid.uuid4())
+    """
+    Create a new API key with the given client name and permissions.
+    """
+    api_key = uuid.uuid4().hex + uuid.uuid4().hex  # 64 characters
     return {"api_key": api_key, "client_name": client_name, "permissions": permissions}
 
 

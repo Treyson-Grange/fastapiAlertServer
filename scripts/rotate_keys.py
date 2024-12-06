@@ -18,8 +18,22 @@ def update_bitwarden_key(item_id, new_key):
     """
     NAME = "alert_box_api_key"
 
-    # ansible will need to do this, so  will use ansible stuff. See networkingweb-ansible
-    # for ideas on how to do this.
+    # General process to update a key in bw.
+    # bw login (should this be done by anisble or something? as we need to enter the password)
+
+    # bw unlock (also need to enter the password)
+
+    # export BW_SESSION (this is returned by bw unlock, so we would need to capture it after unlock)
+
+    # bw get item ITEMID, (in url). Each client will have a different item id.
+
+    # bw edit item ITEMID
+    # bw sync
+    # At this point, the key should be updated in bitwarden.
+    # bw logout
+
+    # this will be run via ansible, not sure when, but it will be.
+
     pass
 
 

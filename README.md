@@ -55,6 +55,7 @@ The main functionality of the project has been split into several files.
 -   `scripts/createdb.py`: Standalone script to create a database file in your directory.
 -   `scripts/backup_script.py`: Script designed to be run as a CRON job to create and store backups of the database.
 -   `scripts/rotate_keys.py`: Script that rotates keys, and updates the keys on bitwarden for each client when applicable. (WIP)
+-   `scripts/create_api_key.py`: Script that given a key, client name and permission, creates an API key in the DB, allowing for a new client.
 
 ### Testing Suite
 
@@ -77,11 +78,17 @@ Testing only endpoints:
 -   `/groups`: GET a JSON list of all groups in our database.
 -   `/keys`: GET a JSON list of all API keys.
 
+Documentation:
+
+-   `/docs`: FastAPI allows for Swagger UI out of the box, allowing to see the documentation for each of our endpoints.
+
 ## Alert Structure
+
+There are two types of alerts that accomplish different tasks.
 
 ### Auto Alerts:
 
-Will be triggered, added, and displayed till cleared:
+Will be triggered, added, and displayed till it's cleared or expired:
 
 -   `message`: Alert description, purely for display.
 -   `criticality`: There are 3 levels. 0: Critical | 1: Warning | 2: Info.
@@ -103,6 +110,9 @@ These alerts can be manually cleared if the event is addressed early.
 
 Criticality levels decrease (0 is critical, 2 is informational) as the due date approaches.
 
-## Food for thought / Mind Dump
+## TODO
 
--   For auto alerts, we should change it so on creation, we create the date object ourselves, so we know its in the correct format.
+-   [x] For auto alerts, we should change it so on creation, we create the date object ourselves, so we know its in the correct format. (set it up so that default is correct, so if its not provided, we're good.)
+-   [ ] Set up the Alert models to have a foreign key to Group.
+-   [ ] Finish and test the `rotate_keys.py` (low priority)
+-   [ ] Set it up so that noc creates a auto alert on break, like when something goes offline for x seconds or something.
