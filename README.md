@@ -1,8 +1,8 @@
 # FastAPI Alert Server
 
-This is a POC (for now) for work. We threw ideas around about this alert system for a while now. Finally coming to fruition.
+This is a Alert Server meant to run on a box, allowing for a better alert system to track expiration dates, and detect issues.
 
-Meant to be dead simple. If we can sell this to our team, we can start extending to all of USU IT. We think that this will be useful to anyone, and simple enough, that it is well worth it.
+Meant to be dead simple. Meant for USU IT Networking for now, We think that this will be useful to anyone, and simple enough, that it is well worth it.
 
 The general idea of this is to run it on a box. It more or less acts as a catch all alert system. For example, it will run checks, and when applicable create an alert. Then, we will be able to query the box to get all related alerts. For example, noc will get alerts from here instead of calculating it every x seconds like how I initially developed the alert system.
 
@@ -35,6 +35,10 @@ docker run --name alertbox -d -p 9000:8000 alertbox
 ```
 
 Head to [localhost:8000/all](localhost:8000/all) (a test endpoint that does not require a API key) to verify the functionality of the server.
+
+## Set up New Client
+
+See [New Client Instructions](/new_client.md) for steps to allow a site to access the alert box.
 
 ## Structure
 
@@ -88,12 +92,12 @@ There are two types of alerts that accomplish different tasks.
 
 ### Auto Alerts:
 
-Will be triggered, added, and displayed till it's cleared or expired:
+Will be triggered, added, and displayed till it's cleared or expired.
 
 -   `message`: Alert description, purely for display.
 -   `criticality`: There are 3 levels. 0: Critical | 1: Warning | 2: Info.
 -   `autoClear`: Bool to determine whether alert will need manual clear.
--   `timestamp`: datetime of when the alert was set.
+-   `timestamp`: datetime of when the alert was set. (do not include when creating alerts)
 -   `clearAfter`: Minutes the alert should last.
 -   `group`: Group that the alert belongs to/will be sent to.
 

@@ -1,6 +1,6 @@
 from peewee import Model, CharField, IntegerField, BooleanField, DateTimeField
 from app.database import db
-import datetime
+from datetime import datetime, timezone
 
 
 class AlertModel(Model):
@@ -14,7 +14,7 @@ class AlertModel(Model):
     autoClear = BooleanField()
 
     # Initial timestamp of the alert
-    timestamp = DateTimeField(default=datetime.datetime.now)
+    timestamp = DateTimeField(default=datetime.now(timezone.utc))
 
     # Time in minutes after which the alert should be auto-cleared
     clearAfter = IntegerField()
