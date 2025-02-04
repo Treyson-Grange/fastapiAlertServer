@@ -120,3 +120,17 @@ Criticality levels decrease (0 is critical, 2 is informational) as the due date 
 -   [ ] Set up the Alert models to have a foreign key to Group.
 -   [ ] Finish and test the `rotate_keys.py` (low priority)
 -   [ ] Set it up so that noc creates a auto alert on break, like when something goes offline for x seconds or something.
+
+
+## What Next?
+
+I'm leaving this job, so I am unable to finish this project. Here is what needs to be done before we put it on a box and integrate it with our systems.
+
+- [ ] Explore how to allow the box to interact with our systems that require certain setups (aruba, gul, etc)
+- [ ] Rigorous testing
+- [ ] Get keys onto a db instead of via `.env`
+- [ ] Anything on the above [TODO](#todo) list
+- [ ] Get it on a box
+- [ ] Setup alerts for expiring certs, keys, etc
+- [ ] Integrate with NOC, see branch [alert-system-2](https://github.com/utahstate/nx-usunoc/tree/feat/alert-system-2) for a functional demo.
+- [ ] Remember, our goal was to ship this, get it to integrations, pass it on to them, and hopefully it goes to the rest of IT.
